@@ -1,12 +1,12 @@
 # Classy to HubSpot
 
-A `node` intermediary between the Classy and HubSpot APIs.
+[![CircleCI](https://circleci.com/gh/Mediacauseagency/classy-to-hubspot.svg?style=svg)](https://circleci.com/gh/Mediacauseagency/classy-to-hubspot)
 
+A `node` intermediary between the Classy and HubSpot APIs.
 
 ### Getting started
 1. Install the packages: `npm install`.
 2. Get the API keys and add them to a `.env` file in the project's root directory.
-
 
 ### Running tests
 - `npm run test` will run tests in `test/index.js`
