@@ -1,6 +1,7 @@
 const R = require('ramda')
 const c = require('../tmp/campaigns.json')
 const t = require('../tmp/transactions.json')
+const writeToJson = require('./writeToJson')
 
 const format = (campaigns, transactions) => {
   if (!transactions || R.isEmpty(transactions)) return
@@ -29,4 +30,4 @@ const format = (campaigns, transactions) => {
   }, transactions)
 }
 
-console.log(format, format(c, t))
+writeToJson('tmp/formattedData', (format, format(c, t)))

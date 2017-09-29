@@ -1,15 +1,13 @@
 const R = require('ramda')
 const request = require('request')
 const fs = require('fs')
+const writeToJson = require('./writeToJson')
+const {log, errMsg, successMsg} = require('./loggers')
 
 const baseUrl = 'https://api.classy.org'
 let token = ''
 
 // helpers
-const getDateTime = () => new Date().toUTCString()
-const log = msg => console.log(`${getDateTime()} `, msg)
-const errMsg = err => log(`❌  ${err}`)
-const successMsg = success => log(`✅  ${success}`)
 const pageMsg = (page, resource) => `retrieved page ${page} of ${resource}.`
 
 const handleErr = err => {
@@ -128,15 +126,7 @@ const getAllCampaigns = () => {
   })
 }
 
-const writeToJson = (path, content) => {
-  fs.writeFile(`${path}.json`, JSON.stringify(content), function (err) {
-    if (err) return errMsg(err)
-    successMsg(`${path}.json was saved.`)
-  })
-}
-
 const formatData = campaignDict => transactions => {
-  console.log(transactions)
   writeToJson('tmp/campaigns', campaignDict)
   writeToJson('tmp/transactions', transactions)
 }
