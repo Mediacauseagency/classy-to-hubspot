@@ -9,9 +9,9 @@ A `node` intermediary between the Classy and HubSpot APIs.
 2. Get the API keys and add them to a `.env` file in the project's root directory.
 
 ### Running tests
-- `npm run test` will run tests in `test/index.js`
-- `npm run lint` will lint your code based on the [standard JS](https://standardjs.com/) and make fixes where possible
-- `npm run check` will run a dependency check
-- you can run `npm run test-all` to run all of the above
+`npm run test` will do the following: 
+- do a dependency check
+- lint your code based on [standard JS](https://standardjs.com/) and make fixes where possible
+- run tests in `test/index.js`
 
-#### *Make sure that `npm run test-all` passes before commiting.*
+#### *Make sure that `npm run test` passes before commiting.*

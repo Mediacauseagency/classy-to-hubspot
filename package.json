@@ -2,12 +2,11 @@
   "name": "classy-to-hubspot",
   "version": "1.0.0",
   "description": "migrate classy supporters to hubspot",
-  "main": "index.js",
+  "main": "./src/index.js",
   "scripts": {
-    "check": "dependency-check ./package.json -i js",
-    "lint": "standard --fix ./*.js",
-    "test": "tape test/index.js | tap-spec",
-    "test-all": "npm run check && npm run lint && npm run test"
+    "check": "dependency-check package.json",
+    "lint": "standard --fix ./src/*.js ./test/*.js",
+    "test": "npm run check && npm run lint && tape test/index.js | tap-spec"
   },
   "keywords": [
     "classy",
