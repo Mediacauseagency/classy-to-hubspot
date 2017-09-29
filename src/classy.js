@@ -1,8 +1,9 @@
 const request = require('request')
 const baseUrl = 'https://api.classy.org/'
+const orgId = '27460'
 
-function getToken (cb) {
-  return request({
+function getToken(cb){
+  request({
     method: 'POST',
     baseUrl,
     url: '/oauth2/auth',
@@ -11,15 +12,27 @@ function getToken (cb) {
       client_id: process.env.CLASSY_ID,
       client_secret: process.env.CLASSY_SECRET
     }
-  }, function (err, resp) {
+  }, function(err, resp){
     if (err) return console.log(err)
     cb(JSON.parse(resp.body).access_token)
   })
 }
 
+function getSupporters(token){
+  request({
+    method: 'GET',
+    baseUrl,
+    url: `2.0/organizations/${orgId}/supporters`,
+    auth: {bearer: token}
+  }, function(err, resp,) {
+    console.log(JSON.parse(resp.body))
+  })
+}
+
+// todo: use run-waterfall to better organize callbacks
 function init () {
-  getToken(function (token) {
-    console.log(token)
+  getToken(function(token){
+    getSupporters(token)
   })
 }
 
