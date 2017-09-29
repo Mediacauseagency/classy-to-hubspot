@@ -9,7 +9,9 @@ const errMsg = err => log(`❌  ${err}`)
 const successMsg = success => log(`✅  ${success}`)
 const pageMsg = (page) => `retrieved page ${page}.`
 
-const handleErr = err => {
+let token = ''
+
+const  handleErr = err => {
   // todo: write to error-log.json
   errMsg(err)
 }
@@ -19,8 +21,8 @@ const req = (options, callback, msg) => {
   request(R.merge({
     baseUrl,
     json: true
-  }, options), function (err, resp) {
-    if (err) return handleErr(err)
+  }, options), function(err, resp){
+    if(err) return handleErr(err)
     successMsg(`${msg(resp.body)}`)
     callback(resp)
   })
@@ -38,16 +40,15 @@ const getToken = (cb) => {
   }, cb, () => 'requested access token.')
 }
 
-const getNextPageOfTransactions = (token, results) => (resp) => {
+const getNextPageOfTransactions = (results) => (resp) => {
   const body = resp.body
   const nextPageUrl = body.next_page_url
   const updatedResults = R.concat(results, resp.body.data)
   if (nextPageUrl) {
     transactionsRequest({
       url: nextPageUrl.split(baseUrl)[1],
-      cb: getNextPageOfTransactions(token, updatedResults),
-      msg: (body) => pageMsg(body.current_page),
-      token
+      cb: getNextPageOfTransactions(updatedResults),
+      msg: (body) => pageMsg(body.current_page)
     })
   } else {
     successMsg('retrieved all pages.')
@@ -56,16 +57,15 @@ const getNextPageOfTransactions = (token, results) => (resp) => {
 }
 
 const formatTransactions = (data) => {
-  console.log(data)
+  console.log(data[1])
 }
 
-const transactionsRequest = ({url, cb, msg, token}) => {
+const transactionsRequest = ({url, cb, msg}) => {
   req({
     method: 'GET',
     url,
     qs: {
-      'with': 'supporter',
-      fields: 'member_name,supporter',
+      'with': 'campaign',
       per_page: 100
     },
     auth: {bearer: token}
@@ -73,13 +73,12 @@ const transactionsRequest = ({url, cb, msg, token}) => {
 }
 
 const getAllTransactions = (resp) => {
-  const token = resp.body.access_token
+  token = resp.body.access_token
   const results = []
   transactionsRequest({
     url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/transactions`,
-    cb: getNextPageOfTransactions(token, results),
-    msg: () => pageMsg('1'),
-    token
+    cb: getNextPageOfTransactions(results),
+    msg: () => pageMsg('1')
   })
 }
 
