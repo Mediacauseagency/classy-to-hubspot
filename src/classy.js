@@ -37,11 +37,18 @@ function getToken (cb) {
 function getSupporters (resp) {
   req({
     method: 'GET',
-    url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/supporters`,
+    url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/transactions`,
+    qs: {
+      'with': 'supporter',
+      fields: 'member_name,supporter'
+    },
     auth: {bearer: resp.body.access_token}
   }, function (resp) {
-    console.log(resp.body)
   }, 'retrieved supporter data.')
+}
+
+function formatData (resp) {
+
 }
 
 // todo: use run-waterfall to better organize callbacks
