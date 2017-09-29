@@ -1,6 +1,5 @@
 const request = require('request')
 const baseUrl = 'https://api.classy.org/'
-const orgId = '27460'
 
 function getToken (cb) {
   request({
@@ -22,7 +21,7 @@ function getSupporters (token) {
   request({
     method: 'GET',
     baseUrl,
-    url: `2.0/organizations/${orgId}/supporters`,
+    url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/supporters`,
     auth: {bearer: token}
   }, function (err, resp) {
     if (err) return console.log(err)
