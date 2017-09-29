@@ -28,7 +28,6 @@ const req = (options, callback, msg) => {
   })
 }
 
-
 const postToken = (cb) => {
   req({
     method: 'POST',
@@ -72,7 +71,7 @@ const get = ({url, cb, msg, queryObj}) => {
   }, cb, msg)
 }
 
-const getAllPages = ({url, resource, cb, queryObj}) => (resp) => {
+const getAllPages = ({url, resource, cb, queryObj}) => {
   const results = []
   get({
     url,
@@ -82,19 +81,39 @@ const getAllPages = ({url, resource, cb, queryObj}) => (resp) => {
   })
 }
 
+const getAllTransactions = (campaignData) => {
+  const campaignDict = R.reduce((acc, val) => 
+      R.assoc([val.id], val.name, acc)
+  , {}, campaignData || [])
+  getAllPages({
+    url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/transactions`,
+    resource: 'transactions',
+    cb: formatData(campaignDict),
+    queryObj: {
+      fields: 'campaign_id,created_at,total_gross_amount,supporter',
+      'with': 'supporter'
+    }
+  })
+}
+
+const getAllCampaigns = () => {
+  getAllPages({
+    url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/campaigns`,
+    resource: 'campaigns',
+    cb: getAllTransactions,
+    queryObj: {
+      fields: 'id,name',
+    }
+  })
+}
+
+const formatData = campaignDict => transactions => {
+  console.log(campaignDict, transactions)
+}
+
 const init = () => {
   log('🤖  connecting to Classy API...')
-  postToken(
-    getAllPages({
-      url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/transactions`,
-      resource: 'transactions',
-      cb: x => console.log(x),
-      queryObj: {
-        fields: 'campaign_id,created_at,total_gross_amount,supporter',
-        'with': 'supporter'
-      }
-    })
-  )
+  postToken(getAllCampaigns)
 }
 
 module.exports = init()
