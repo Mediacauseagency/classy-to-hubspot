@@ -2,31 +2,31 @@ const R = require('ramda')
 const request = require('request')
 const baseUrl = 'https://api.classy.org'
 
+// helpers
 const getDateTime = () => new Date().toUTCString()
-
 const log = msg => console.log(`${getDateTime()} `, msg)
-
 const errMsg = err => log(`❌  ${err}`)
 const successMsg = success => log(`✅  ${success}`)
+const pageMsg = (page) => `retrieved page ${page}.`
 
-const  handleErr = err => {
+const handleErr = err => {
   // todo: write to error-log.json
   errMsg(err)
 }
 
 // a wrapper for request that sets defaults and handles err and resp
-function req(options, callback, msg){
+const req = (options, callback, msg) => {
   request(R.merge({
     baseUrl,
     json: true
-  }, options), function(err, resp){
-    if(err) return handleErr(err)
+  }, options), function (err, resp) {
+    if (err) return handleErr(err)
     successMsg(`${msg(resp.body)}`)
     callback(resp)
   })
 }
 
-function getToken (cb) {
+const getToken = (cb) => {
   req({
     method: 'POST',
     url: '/oauth2/auth',
@@ -38,26 +38,28 @@ function getToken (cb) {
   }, cb, () => 'requested access token.')
 }
 
-const pageMsg = (page) => `retrieved page ${page}.`
-
-const getNextPage = (token, results) => (resp) => {
+const getNextPageOfTransactions = (token, results) => (resp) => {
   const body = resp.body
   const nextPageUrl = body.next_page_url
   const updatedResults = R.concat(results, resp.body.data)
   if (nextPageUrl) {
-    getTransations({
+    transactionsRequest({
       url: nextPageUrl.split(baseUrl)[1],
-      cb: getNextPage(token, updatedResults),
+      cb: getNextPageOfTransactions(token, updatedResults),
       msg: (body) => pageMsg(body.current_page),
       token
     })
   } else {
     successMsg('retrieved all pages.')
-    console.log(updatedResults)
+    formatTransactions(updatedResults)
   }
 }
 
-function getTransations ({url, cb, msg, token}) {
+const formatTransactions = (data) => {
+  console.log(data)
+}
+
+const transactionsRequest = ({url, cb, msg, token}) => {
   req({
     method: 'GET',
     url,
@@ -70,19 +72,19 @@ function getTransations ({url, cb, msg, token}) {
   }, cb, msg)
 }
 
-function getAllTransactions (resp) {
+const getAllTransactions = (resp) => {
   const token = resp.body.access_token
   const results = []
-  getTransations({
+  transactionsRequest({
     url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/transactions`,
-    cb: getNextPage(token, results),
+    cb: getNextPageOfTransactions(token, results),
     msg: () => pageMsg('1'),
     token
   })
 }
 
 // todo: use run-waterfall to better organize callbacks
-function init () {
+const init = () => {
   log('🤖  connecting to Classy API...')
   getToken(getAllTransactions)
 }
