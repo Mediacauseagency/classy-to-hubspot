@@ -6,19 +6,22 @@ const getDateTime = () => new Date().toUTCString()
 
 const log = msg => console.log(`${getDateTime()} `, msg)
 
+const errMsg = err => log(`❌  ${err}`)
+const successMsg = success => log(`✅  ${success}`)
+
 const  handleErr = err => {
   // todo: write to error-log.json
-  log(`❌  ${err}`)
+  errMsg(err)
 }
 
 // a wrapper for request that sets defaults and handles err and resp
-function req(options, callback, successMsgAction){
+function req(options, callback, msg){
   request(R.merge({
     baseUrl,
     json: true
   }, options), function(err, resp){
     if(err) return handleErr(err)
-    log(`✅  Successfully ${successMsgAction}`)
+    successMsg(`${msg(resp.body)}`)
     callback(resp)
   })
 }
@@ -32,21 +35,23 @@ function getToken (cb) {
       client_id: process.env.CLASSY_ID,
       client_secret: process.env.CLASSY_SECRET
     }
-  }, cb, 'requested access token.')
+  }, cb, () => 'requested access token.')
 }
+
+const pageMsg = (page) => `retrieved page ${page}.`
 
 const getNextPage = (token) => (resp) => {
   const body = resp.body
-  console.log(body)
   const nextPageUrl = body.next_page_url
   if (nextPageUrl) {
     getTransations({
       url: nextPageUrl.split(baseUrl)[1],
       cb: getNextPage(token),
-      msg: 'retrieving page.',
+      msg: (body) => pageMsg(body.current_page),
       token
     })
   } else {
+    successMsg('retrieved all pages.')
   }
 }
 
@@ -68,7 +73,7 @@ function getAllTransactions (resp) {
   getTransations({
     url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/transactions`,
     cb: getNextPage(token),
-    msg: 'retrieving page.',
+    msg: () => pageMsg('1'),
     token
   })
 }
