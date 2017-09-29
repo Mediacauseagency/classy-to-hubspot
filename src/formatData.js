@@ -10,7 +10,7 @@ const format = (campaigns, transactions) => {
       first_name: supporter.first_name || t.billing_first_name || '',
       last_name: supporter.last_name || t.billing_last_name || '',
       email_address: supporter.email_address || t.member_email_address || '',
-      phone: (supporter.phone || t.member_phone || '').replace(/\D/g,''),
+      phone: (supporter.phone || t.member_phone || '').replace(/\D/g, ''),
       supporter_id: supporter.id || '',
       address_1: supporter.address1 || t.billing_address1 || '',
       address_2: supporter.address2 || t.billing_address2 || '',
@@ -30,4 +30,3 @@ const format = (campaigns, transactions) => {
 }
 
 console.log(format, format(c, t))
-

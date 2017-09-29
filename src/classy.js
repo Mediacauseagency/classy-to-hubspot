@@ -12,7 +12,7 @@ const errMsg = err => log(`❌  ${err}`)
 const successMsg = success => log(`✅  ${success}`)
 const pageMsg = (page, resource) => `retrieved page ${page} of ${resource}.`
 
-const  handleErr = err => {
+const handleErr = err => {
   // todo: write to error-log.json
   errMsg(err)
 }
@@ -22,8 +22,8 @@ const req = (options, callback, msg) => {
   request(R.merge({
     baseUrl,
     json: true
-  }, options), function(err, resp){
-    if(err) return handleErr(err)
+  }, options), function (err, resp) {
+    if (err) return handleErr(err)
     successMsg(`${msg(resp.body)}`)
     callback(resp)
   })
@@ -40,9 +40,9 @@ const postToken = (cb) => {
     }
   }, (resp) => {
       // set token globally so we don't have to keep passing it around
-      token = resp.body.access_token
-      cb()
-    }, () => 'requested access token.')
+    token = resp.body.access_token
+    cb()
+  }, () => 'requested access token.')
 }
 
 const getNextPage = (results, resource, cb) => (resp) => {
@@ -103,7 +103,7 @@ const transactionFields = [
 ]
 
 const getAllTransactions = (campaignData) => {
-  const campaignDict = R.reduce((acc, val) => 
+  const campaignDict = R.reduce((acc, val) =>
       R.assoc([val.id], val.name, acc)
   , {}, campaignData || [])
   getAllPages({
@@ -123,14 +123,14 @@ const getAllCampaigns = () => {
     resource: 'campaigns',
     cb: getAllTransactions,
     queryObj: {
-      fields: 'id,name',
+      fields: 'id,name'
     }
   })
 }
 
 const writeToJson = (path, content) => {
-  fs.writeFile(`${path}.json`, JSON.stringify(content), function(err) {
-    if(err) return errMsg(err)
+  fs.writeFile(`${path}.json`, JSON.stringify(content), function (err) {
+    if (err) return errMsg(err)
     successMsg(`${path}.json was saved.`)
   })
 }
