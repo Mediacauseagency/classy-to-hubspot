@@ -82,6 +82,26 @@ const getAllPages = ({url, resource, cb, queryObj}) => {
   })
 }
 
+const transactionFields = [
+  'billing_first_name',
+  'billing_last_name',
+  'billing_address1',
+  'billing_address2',
+  'billing_city',
+  'billing_state',
+  'billing_postal_code',
+  'billing_country',
+  'member_email_address',
+  'member_phone',
+  'is_anonymous',
+  'recurring_donation_plan_id',
+  'payment_method',
+  'campaign_id',
+  'created_at',
+  'total_gross_amount',
+  'supporter'
+]
+
 const getAllTransactions = (campaignData) => {
   const campaignDict = R.reduce((acc, val) => 
       R.assoc([val.id], val.name, acc)
@@ -91,7 +111,7 @@ const getAllTransactions = (campaignData) => {
     resource: 'transactions',
     cb: formatData(campaignDict),
     queryObj: {
-      fields: 'campaign_id,created_at,total_gross_amount,supporter',
+      fields: transactionFields.join(','),
       'with': 'supporter'
     }
   })
@@ -116,6 +136,7 @@ const writeToJson = (path, content) => {
 }
 
 const formatData = campaignDict => transactions => {
+  console.log(transactions)
   writeToJson('tmp/campaigns', campaignDict)
   writeToJson('tmp/transactions', transactions)
 }
