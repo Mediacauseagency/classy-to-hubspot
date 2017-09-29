@@ -40,18 +40,20 @@ function getToken (cb) {
 
 const pageMsg = (page) => `retrieved page ${page}.`
 
-const getNextPage = (token) => (resp) => {
+const getNextPage = (token, results) => (resp) => {
   const body = resp.body
   const nextPageUrl = body.next_page_url
+  const updatedResults = R.concat(results, resp.body.data)
   if (nextPageUrl) {
     getTransations({
       url: nextPageUrl.split(baseUrl)[1],
-      cb: getNextPage(token),
+      cb: getNextPage(token, updatedResults),
       msg: (body) => pageMsg(body.current_page),
       token
     })
   } else {
     successMsg('retrieved all pages.')
+    console.log(updatedResults)
   }
 }
 
@@ -70,14 +72,14 @@ function getTransations ({url, cb, msg, token}) {
 
 function getAllTransactions (resp) {
   const token = resp.body.access_token
+  const results = []
   getTransations({
     url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/transactions`,
-    cb: getNextPage(token),
+    cb: getNextPage(token, results),
     msg: () => pageMsg('1'),
     token
   })
 }
-
 
 // todo: use run-waterfall to better organize callbacks
 function init () {
