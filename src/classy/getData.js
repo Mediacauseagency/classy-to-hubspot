@@ -1,31 +1,24 @@
-const R = require('ramda')
 const postToken = require('./postToken')
 const getAllPages = require('./getAllPages')
 const transactionFields = require('./transactionFields')
 
-const writeToJson = require('../helpers/writeToJson')
+const dict = require('../helpers/dictionary')
 const {log} = require('../helpers/loggers')
 
-const getAllCampaigns = (finalCb) => () => {
+const getAllCampaigns = (formatData) => () => {
   getAllPages({
-    url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/campaigns`,
     resource: 'campaigns',
-    cb: getAllTransactions(finalCb),
+    cb: getAllTransactions(formatData),
     queryObj: {
       fields: 'id,name'
     }
   })
 }
 
-const getAllTransactions = (finalCb) => (campaignData) => {
-  // creates an object where the keys are the campaign ids and the values are the campain names
-  const campaignDict = R.reduce((acc, val) =>
-      R.assoc([val.id], val.name, acc)
-  , {}, campaignData || [])
+const getAllTransactions = (formatData) => (campaignData) => {
   getAllPages({
-    url: `2.0/organizations/${process.env.CLASSY_ORG_ID}/transactions`,
     resource: 'transactions',
-    cb: finalCb(campaignDict),
+    cb: formatData(dict({data: campaignData, key: 'id', val: 'name'})),
     queryObj: {
       fields: transactionFields.join(','),
       'with': 'supporter'
@@ -33,9 +26,9 @@ const getAllTransactions = (finalCb) => (campaignData) => {
   })
 }
 
-const init = (finalCb) => {
+const init = (formatData) => {
   log('🤖  connecting to Classy API...')
-  postToken(getAllCampaigns(finalCb))
+  postToken(getAllCampaigns(formatData))
 }
 
 module.exports = init
