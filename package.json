@@ -7,6 +7,7 @@
     "check": "dependency-check package.json",
     "lint": "standard --fix ./src/*.js ./test/*.js",
     "test": "npm run check && npm run lint && tape test/index.js | tap-spec",
+    "setup": "npm install && mkdir -p tmp",
     "dev": "node --inspect src/index.js"
   },
   "keywords": [

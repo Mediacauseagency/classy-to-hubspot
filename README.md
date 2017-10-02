@@ -5,7 +5,7 @@
 A `node` intermediary between the Classy and HubSpot APIs.
 
 ### Getting started
-1. Install the packages: `npm install`.
+1. Install packages and create an empty `tmp` directory: `npm setup`.
 2. Get the API keys and add them to a `.env` file in the project's root directory.
 
 ### Running tests
@@ -18,14 +18,10 @@ A `node` intermediary between the Classy and HubSpot APIs.
 
 
 ## Todo: 
-- rename classy to getClassy
-- rename formatData to formatClassyData
 - add tests for formatData (use tmp data)
 - double check all of the field names
 - format to Classy data to csv and send csv to client
 - setup HubSpot integration
-
-
 
 
 
