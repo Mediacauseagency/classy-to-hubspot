@@ -1,0 +1,19 @@
+module.exports = [
+  'billing_first_name',
+  'billing_last_name',
+  'billing_address1',
+  'billing_address2',
+  'billing_city',
+  'billing_state',
+  'billing_postal_code',
+  'billing_country',
+  'member_email_address',
+  'member_phone',
+  'is_anonymous',
+  'recurring_donation_plan_id',
+  'payment_method',
+  'campaign_id',
+  'created_at',
+  'total_gross_amount',
+  'supporter'
+]

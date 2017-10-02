@@ -17,32 +17,15 @@ A `node` intermediary between the Classy and HubSpot APIs.
 #### *Make sure that `npm run test` passes before commiting.*
 
 
-Sample response for supporter: 
+## Todo: 
+- rename classy to getClassy
+- rename formatData to formatClassyData
+- add tests for formatData (use tmp data)
+- double check all of the field names
+- format to Classy data to csv and send csv to client
+- setup HubSpot integration
 
-```js
-{
-  first_name: 'Stan',
-  last_name: 'Smith',
-  updated_at: null,
-  metadata: null,
-  id: 1234567,
-  email_address: 'stan@smith.org',
-  phone: '123-234-5678',
-  location: null,
-  address1: '123 Tennis Court',
-  address2: 'Apt. B',
-  city: 'Boston',
-  state: 'MA',
-  country: 'US',
-  postal_code: '12345',
-  gender: null,
-  member_id: 987654,
-  source_member_id: null,
-  source_organization_id: 12345,
-  source_campaign_id: null,
-  source_fundraising_page_id: null,
-  opt_in: false,
-  created_at: '2016-03-24T00:00:00+0000',
-  last_emailed_at: null 
-}
-```
+
+
+
+

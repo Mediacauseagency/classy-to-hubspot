@@ -1,7 +1,5 @@
 const R = require('ramda')
-const c = require('../tmp/campaigns.json')
-const t = require('../tmp/transactions.json')
-const writeToJson = require('./writeToJson')
+const writeToJson = require('../helpers/writeToJson')
 
 const format = (campaigns, transactions) => {
   if (!transactions || R.isEmpty(transactions)) return
@@ -30,4 +28,6 @@ const format = (campaigns, transactions) => {
   }, transactions)
 }
 
-writeToJson('tmp/formattedData', (format, format(c, t)))
+module.exports = (campaigns) => (transactions) => {
+  writeToJson('tmp/formattedData', (format, format(campaigns, transactions)))
+}
