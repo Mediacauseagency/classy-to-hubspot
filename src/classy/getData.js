@@ -5,20 +5,18 @@ const transactionFields = require('./transactionFields')
 const dict = require('../helpers/dictionary')
 const {log} = require('../helpers/loggers')
 
-const getAllCampaigns = (formatData) => () => {
+const getAllCampaigns = (cb) => () => {
   getAllPages({
+    cb,
     resource: 'campaigns',
-    cb: getAllTransactions(formatData),
-    queryObj: {
-      fields: 'id,name'
-    }
+    queryObj: { fields: 'id,name' }
   })
 }
 
-const getAllTransactions = (formatData) => (campaignData) => {
+const getAllTransactions = (cb) => (campaignData) => {
   getAllPages({
     resource: 'transactions',
-    cb: formatData(dict({data: campaignData, key: 'id', val: 'name'})),
+    cb: cb(dict({data: campaignData, key: 'id', val: 'name'})),
     queryObj: {
       fields: transactionFields.join(','),
       'with': 'supporter'
@@ -28,7 +26,11 @@ const getAllTransactions = (formatData) => (campaignData) => {
 
 const init = (formatData) => {
   log('🤖  connecting to Classy API...')
-  postToken(getAllCampaigns(formatData))
+  postToken(
+    getAllCampaigns(
+      getAllTransactions(formatData)
+    )
+  )
 }
 
 module.exports = init
