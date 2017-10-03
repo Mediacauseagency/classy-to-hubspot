@@ -10,10 +10,12 @@ const formatData = require('./classy/formatData')
 
 const dict = require('./helpers/dictionary')
 const {log} = require('./helpers/loggers')
+const updateFile = require('./helpers/updateFile')
+const addDateKeyAndConcat = require('./helpers/addDateKeyAndConcat')
 
 const sendToHubSpot = (formattedData) => {
   const ids = R.pluck('transaction_id', formattedData)
-  console.log(ids)
+  updateFile('history/classy-api-successes.json', ids, addDateKeyAndConcat('ids'))
 }
 
 const getAllCampaigns = () => {

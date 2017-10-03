@@ -6,7 +6,7 @@ const addDateKeyAndConcat = require('../helpers/addDateKeyAndConcat')
 const {errMsg, successMsg} = require('../helpers/loggers')
 
 const handleErr = err => {
-  updateFile('history/errors.json', err, addDateKeyAndConcat('error'))
+  updateFile('history/classy-api-errors.json', err, addDateKeyAndConcat('error'))
   errMsg(err)
 }
 
