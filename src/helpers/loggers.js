@@ -1,5 +1,5 @@
-const getDateTime = () => new Date().toISOString()
-const log = msg => console.log(`${getDateTime()} `, msg)
+const iso = require('./iso')
+const log = msg => console.log(`${iso()} `, msg)
 const errMsg = msg => log(`❌  ${msg}`)
 const successMsg = msg => log(`✅  ${msg}`)
 const writeMsg = msg => log(`✏️  ${msg}`)

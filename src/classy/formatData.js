@@ -1,11 +1,11 @@
 const R = require('ramda')
-const write = require('../helpers/write')
 
 const format = (campaigns, transactions) => {
   if (!transactions || R.isEmpty(transactions)) return false
   return R.map(t => {
     const supporter = t.supporter || {}
     return {
+      transaction_id: t.id,
       first_name: supporter.first_name || t.billing_first_name || '',
       last_name: supporter.last_name || t.billing_last_name || '',
       email_address: supporter.email_address || t.member_email_address || '',
@@ -29,6 +29,5 @@ const format = (campaigns, transactions) => {
 }
 
 module.exports = (cb, campaigns) => (transactions) => {
-  const formattedData = format(campaigns, transactions)
-  write('tmp/formattedData.json', JSON.stringify(formattedData), cb)
+  cb(format(campaigns, transactions))
 }
