@@ -9,7 +9,7 @@
     "test": "npm run check && npm run lint && tape test/index.js | tap-spec",
     "setup": "npm install && mkdir -p history",
     "dev": "node --inspect src/index.js",
-    "start": "npm run setup && node src/index.js"
+    "start": "node src/index.js"
   },
   "keywords": [
     "classy",
