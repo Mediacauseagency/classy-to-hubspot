@@ -1,14 +1,15 @@
 {
   "name": "classy-to-hubspot",
   "version": "1.0.0",
-  "description": "migrate classy supporters to hubspot",
+  "description": "migrate classy data to hubspot",
   "main": "./src/index.js",
   "scripts": {
     "check": "dependency-check package.json",
     "lint": "standard --fix ./src/*.js ./test/*.js",
     "test": "npm run check && npm run lint && tape test/index.js | tap-spec",
     "setup": "npm install && mkdir -p history",
-    "dev": "node --inspect src/index.js"
+    "dev": "node --inspect src/index.js",
+    "start": "npm run setup && node src/index.js"
   },
   "keywords": [
     "classy",
@@ -21,6 +22,7 @@
     "dotenv": "^4.0.0",
     "hubspot": "^1.0.2",
     "jsonexport": "^2.0.11",
+    "moment": "^2.18.1",
     "node-cron": "^1.2.1",
     "ramda": "^0.24.1",
     "request": "^2.83.0",

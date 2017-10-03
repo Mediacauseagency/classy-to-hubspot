@@ -6,8 +6,9 @@ const addDateKeyAndConcat = require('../helpers/addDateKeyAndConcat')
 const {errMsg, successMsg} = require('../helpers/loggers')
 
 const handleErr = err => {
-  updateFile('history/classy-api-errors.json', err, addDateKeyAndConcat('error'))
-  errMsg(err)
+  const errorHistoryPath = 'history/classy-api-errors.json'
+  updateFile(errorHistoryPath, err, addDateKeyAndConcat('error'))
+  errMsg('Error: See ' + errorHistoryPath)
 }
 
 // a wrapper for request that sets defaults and handles err and resp
@@ -16,7 +17,7 @@ module.exports = (options, callback, msg) => {
     baseUrl,
     json: true
   }, options), function (undefined, resp, body) {
-    if (body.error) return handleErr(body.error_description)
+    if (body.error) return handleErr(body.error)
     successMsg(`${msg(body)}`)
     callback(body)
   })

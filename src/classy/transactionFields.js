@@ -15,6 +15,7 @@ module.exports = [
   'payment_method',
   'campaign_id',
   'created_at',
+  'updated_at',
   'total_gross_amount',
   'supporter'
 ]

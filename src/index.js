@@ -2,6 +2,8 @@
 require('dotenv').config()
 const R = require('ramda')
 const cron = require('node-cron')
+const fs = require('fs')
+const moment = require('moment')
 
 const postToken = require('./classy/postToken')
 const getAllPages = require('./classy/getAllPages')
@@ -13,9 +15,12 @@ const {log} = require('./helpers/loggers')
 const updateFile = require('./helpers/updateFile')
 const addDateKeyAndConcat = require('./helpers/addDateKeyAndConcat')
 
+const successHistoryPath = 'history/classy-api-successes.json'
+
 const sendToHubSpot = (formattedData) => {
   const ids = R.pluck('transaction_id', formattedData)
-  updateFile('history/classy-api-successes.json', ids, addDateKeyAndConcat('ids'))
+  updateFile(successHistoryPath, ids, addDateKeyAndConcat('ids'))
+  // TODO send data to hubspot
 }
 
 const getAllCampaigns = () => {
@@ -27,17 +32,29 @@ const getAllCampaigns = () => {
 }
 
 const getAllTransactions = (campaignData) => {
-  getAllPages({
-    resource: 'transactions',
-    cb: formatData(sendToHubSpot, dict({data: campaignData, key: 'id', val: 'name'})),
-    queryObj: {
+  fs.readFile(successHistoryPath, 'utf8', (_, data) => {
+    const defaultQueryObj = {
       fields: transactionFields.join(','),
       'with': 'supporter'
     }
+    const queryObj = data
+      ? R.merge(defaultQueryObj, {
+        filter: `updated_at>=${moment().subtract(35, 'minutes').format()}`
+      })
+      : defaultQueryObj
+    getAllPages({
+      resource: 'transactions',
+      cb: formatData(sendToHubSpot, dict({data: campaignData, key: 'id', val: 'name'})),
+      queryObj
+    })
   })
 }
 
-log('🤖  connecting to Classy API...')
-postToken(getAllCampaigns)
+const init = () => {
+  log('🤖  connecting to Classy API...')
+  postToken(getAllCampaigns)
+}
 
-// cron.schedule('*/4 * * * * *', () => console.log('blink'))
+cron.schedule('0 */30 * * * *', init)
+
+init()
