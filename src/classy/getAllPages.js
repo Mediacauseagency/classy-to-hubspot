@@ -7,12 +7,11 @@ const {successMsg} = require('../helpers/loggers')
 const pageMsg = (page, resource) => `retrieved page ${page} of ${resource}.`
 const resourceUrl = resource => `2.0/organizations/${process.env.CLASSY_ORG_ID}/${resource}`
 
-const getNextPage = (results, resource, cb) => (resp) => {
-  const body = resp.body
+const getNextPage = (results, resource, cb) => (body) => {
   const nextPageUrl = body.next_page_url
-  const allResults = R.concat(results, resp.body.data)
+  const allResults = R.concat(results, body.data || [])
   // results are always paginated and we want to make sure to get results from all pages
-  if (nextPageUrl) {
+  if (!R.isEmpty(allResults) && nextPageUrl) {
     get({
       url: nextPageUrl.split(baseUrl)[1],
       cb: getNextPage(allResults, resource, cb),

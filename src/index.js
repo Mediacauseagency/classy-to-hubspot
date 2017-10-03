@@ -1,9 +1,7 @@
 // first, get various API keys and info from .env and assign them to the process.env
 require('dotenv').config()
 const R = require('ramda')
-const toCsv = require('jsonexport')
 const cron = require('node-cron')
-const write = require('./helpers/write')
 
 const postToken = require('./classy/postToken')
 const getAllPages = require('./classy/getAllPages')
@@ -13,7 +11,7 @@ const formatData = require('./classy/formatData')
 const dict = require('./helpers/dictionary')
 const {log} = require('./helpers/loggers')
 
-const sendToHubSpot = (formattedData) =>  {
+const sendToHubSpot = (formattedData) => {
   const ids = R.pluck('transaction_id', formattedData)
   console.log(ids)
 }
@@ -41,4 +39,3 @@ log('🤖  connecting to Classy API...')
 postToken(getAllCampaigns)
 
 // cron.schedule('*/4 * * * * *', () => console.log('blink'))
-

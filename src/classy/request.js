@@ -1,10 +1,12 @@
 const R = require('ramda')
 const request = require('request')
 const baseUrl = require('./baseUrl')
+const updateFile = require('../helpers/updateFile')
+const addDateKeyAndConcat = require('../helpers/addDateKeyAndConcat')
 const {errMsg, successMsg} = require('../helpers/loggers')
 
 const handleErr = err => {
-  // todo: write to error-log.json
+  updateFile('history/errors.json', err, addDateKeyAndConcat('error'))
   errMsg(err)
 }
 
@@ -13,9 +15,9 @@ module.exports = (options, callback, msg) => {
   request(R.merge({
     baseUrl,
     json: true
-  }, options), function (err, resp) {
-    if (err) return handleErr(err)
-    successMsg(`${msg(resp.body)}`)
-    callback(resp)
+  }, options), function (undefined, resp, body) {
+    if (body.error) return handleErr(body.error_description)
+    successMsg(`${msg(body)}`)
+    callback(body)
   })
 }

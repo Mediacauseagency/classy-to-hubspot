@@ -9,9 +9,9 @@ module.exports = (cb) => {
       client_id: process.env.CLASSY_ID,
       client_secret: process.env.CLASSY_SECRET
     }
-  }, (resp) => {
+  }, (body) => {
     // set token globally so we don't have to keep passing it around
-    process.env.CLASSY_ACCESS_TOKEN = resp.body.access_token
+    process.env.CLASSY_ACCESS_TOKEN = body.access_token
     cb()
   }, () => 'requested access token.')
 }
