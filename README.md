@@ -10,7 +10,7 @@ This node project will run a cron job every 30 minutes to get the transaction da
 ### Getting started
 1. Make sure node is installed.
 2. Run `npm run setup`. This will install all of the node packages and create an empty `history` directory.
-3. Get the API keys from and add them to a `.env` file in the project's root directory.
+3. Get the API keys from a fellow dev and add them to a `.env` file in the project's root directory.
 4. Run `npm run start`.
 
 ### Running tests
