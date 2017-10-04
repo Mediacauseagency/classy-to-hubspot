@@ -1,8 +1,28 @@
 const R = require('ramda')
+const dict = require('../helpers/dictionary')
 
 const or = (a, b) => a || b || ''
 
 const format = (campaigns, transactions) => {
+
+  const transactionsWithSupporters = R.filter(t => t.supporter, transactions)
+
+  const getSupporterId = obj => R.path(['supporter', 'id'], obj)
+
+  const supportersDict = R.reduce((acc, obj) =>
+      R.assoc([getSupporterId(obj)], obj.supporter, acc)
+  , {}, transactionsWithSupporters)
+
+  const x = R.reduce((acc, obj) => {
+    const supporterId = getSupporterId(obj)
+    const history = R.path([[supporterId], 'history'], acc)
+    return R.assocPath([[supporterId], 'history'], (history ? (history + ' ' + obj.total_gross_amount) : obj.total_gross_amount), acc)
+  }, supportersDict, transactionsWithSupporters)
+
+
+  debugger
+
+
   if (!transactions || R.isEmpty(transactions)) return false
   return R.map(t => {
     const supporter = t.supporter || {}

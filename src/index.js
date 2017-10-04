@@ -10,7 +10,6 @@ const getAllPages = require('./classy/getAllPages')
 const transactionFields = require('./classy/transactionFields')
 const formatData = require('./classy/formatData')
 
-
 const postForms = require('./hubspot/request')
 
 const dict = require('./helpers/dictionary')
@@ -40,13 +39,11 @@ const getAllTransactions = (campaignData) => {
   fs.readFile(successHistoryPath, 'utf8', (_, data) => {
     const defaultQueryObj = {
       fields: transactionFields.join(','),
-      'with': 'supporter'
+      'with': 'supporter',
     }
-    const queryObj = data
-      ? R.merge(defaultQueryObj, {
-        filter: `created_at>=${moment().subtract(35, 'minutes').format()}`
-      })
-      : defaultQueryObj
+    const queryObj = R.merge(defaultQueryObj, {
+      filter: `created_at>=${moment().subtract(4, 'months').format()}`
+    })
     getAllPages({
       resource: 'transactions',
       cb: formatData(dict({data: campaignData, key: 'id', val: 'name'}), writeIds),
@@ -60,8 +57,7 @@ const init = () => {
   postToken(getAllCampaigns)
 }
 
-cron.schedule('0 */30 * * * *', init)
-
+//cron.schedule('0 */30 * * * *', init) 
 init()
 
 //const testFormData = {
@@ -79,6 +75,8 @@ init()
   //single_donation_amount: '1',
   //donation_is_recurring: 'FALSE',
   //donation_is_anonymous: 'FALSE',
+  //test_multi_line: 'Line one \n line two \n line three \n'
 //}
 
-// postForms(testFormData, x => console.log(x), (body) => body)
+//postForms(testFormData, x => console.log(x), (body) => body)
+
