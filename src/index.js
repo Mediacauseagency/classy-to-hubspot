@@ -10,20 +10,22 @@ const getAllPages = require('./classy/getAllPages')
 const transactionFields = require('./classy/transactionFields')
 const formatData = require('./classy/formatData')
 
+
+const postForms = require('./hubspot/request')
+
 const dict = require('./helpers/dictionary')
 const {log} = require('./helpers/loggers')
 const updateFile = require('./helpers/updateFile')
+const iso = require('./helpers/iso')
 const addDateKeyAndConcat = require('./helpers/addDateKeyAndConcat')
-// const throttleMap = require('./helpers/throttleMap')
-// const rand = require('./helpers/getRandom')
+//const throttleMap = require('./helpers/throttleMap')
+//const rand = require('./helpers/getRandom')
 
 const successHistoryPath = 'history/classy-api-successes.json'
 
-const sendToHubSpot = (formattedData) => {
+const writeIds = (formattedData) => {
   const ids = R.pluck('transaction_id', formattedData)
   updateFile(successHistoryPath, ids, addDateKeyAndConcat('ids'))
-  // throttleMap(rand(50, 200), formattedData, (x) => console.log(x))
-  // TODO send data to hubspot
 }
 
 const getAllCampaigns = () => {
@@ -42,12 +44,12 @@ const getAllTransactions = (campaignData) => {
     }
     const queryObj = data
       ? R.merge(defaultQueryObj, {
-        filter: `updated_at>=${moment().subtract(35, 'minutes').format()}`
+        filter: `created_at>=${moment().subtract(35, 'minutes').format()}`
       })
       : defaultQueryObj
     getAllPages({
       resource: 'transactions',
-      cb: formatData(sendToHubSpot, dict({data: campaignData, key: 'id', val: 'name'})),
+      cb: formatData(dict({data: campaignData, key: 'id', val: 'name'}), writeIds),
       queryObj
     })
   })
@@ -61,3 +63,22 @@ const init = () => {
 cron.schedule('0 */30 * * * *', init)
 
 init()
+
+//const testFormData = {
+  //firstname: 'Yutaka',
+  //lastname: 'Houlette',
+  //email: 'yutakahoulette@gmail.com',
+  //phone: '123456789',
+  //address: '123 Apple St. Apt B',
+  //city: 'Oakland',
+  //state: 'CA',
+  //zip: '94606',
+  //country: 'USA',
+  //donation_date: iso(),
+  //donation_campaign_name: 'Test campaign name',
+  //single_donation_amount: '1',
+  //donation_is_recurring: 'FALSE',
+  //donation_is_anonymous: 'FALSE',
+//}
+
+// postForms(testFormData, x => console.log(x), (body) => body)
