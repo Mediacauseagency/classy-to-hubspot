@@ -1,5 +1,6 @@
 const R = require('ramda')
 const dict = require('../helpers/dictionary')
+const moment = require('moment')
 
 const or = (a, b) => a || b || ''
 
@@ -13,10 +14,22 @@ const format = (campaigns, transactions) => {
       R.assoc([getSupporterId(obj)], obj.supporter, acc)
   , {}, transactionsWithSupporters)
 
+
+  const constructHistory = (history, obj) => {
+    const string = [
+      moment(obj.created_at).format('MM/DD/YY'),
+      '$' + obj.total_gross_amount,
+      Boolean(obj.recurring_donation_plan_id) ? 'Recurring' : false,
+      campaigns[obj.campaign_id] ? campaigns[obj.campaign_id]: false,
+      '#' + obj.id
+    ].filter(Boolean).join(' ')
+    return history ? (history + '\n' + string) : string
+  }
+
   const x = R.reduce((acc, obj) => {
     const supporterId = getSupporterId(obj)
     const history = R.path([[supporterId], 'history'], acc)
-    return R.assocPath([[supporterId], 'history'], (history ? (history + ' ' + obj.total_gross_amount) : obj.total_gross_amount), acc)
+    return R.assocPath([[supporterId], 'history'], constructHistory(history, obj), acc)
   }, supportersDict, transactionsWithSupporters)
 
 
