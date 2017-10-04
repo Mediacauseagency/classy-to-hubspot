@@ -1,7 +1,6 @@
 // first, get various API keys and info from .env and assign them to the process.env
 require('dotenv').config()
 const R = require('ramda')
-const cron = require('node-cron')
 const fs = require('fs')
 const moment = require('moment')
 
@@ -23,8 +22,7 @@ const addDateKeyAndConcat = require('./helpers/addDateKeyAndConcat')
 const successHistoryPath = 'history/classy-api-successes.json'
 
 const writeIds = (formattedData) => {
-  const ids = R.pluck('transaction_id', formattedData)
-  updateFile(successHistoryPath, ids, addDateKeyAndConcat('ids'))
+  updateFile(successHistoryPath, `Downloaded transaction data for ${formatData.length} supporters.`, addDateKeyAndConcat('message'))
 }
 
 const getAllCampaigns = () => {
@@ -39,6 +37,7 @@ const getAllTransactions = (campaignData) => {
   fs.readFile(successHistoryPath, 'utf8', (_, data) => {
     const defaultQueryObj = {
       fields: transactionFields.join(','),
+      sort: 'created_at:desc',
       'with': 'supporter',
     }
     const queryObj = R.merge(defaultQueryObj, {
@@ -61,21 +60,6 @@ const init = () => {
 init()
 
 //const testFormData = {
-  //firstname: 'Yutaka',
-  //lastname: 'Houlette',
-  //email: 'yutakahoulette@gmail.com',
-  //phone: '123456789',
-  //address: '123 Apple St. Apt B',
-  //city: 'Oakland',
-  //state: 'CA',
-  //zip: '94606',
-  //country: 'USA',
-  //donation_date: iso(),
-  //donation_campaign_name: 'Test campaign name',
-  //single_donation_amount: '1',
-  //donation_is_recurring: 'FALSE',
-  //donation_is_anonymous: 'FALSE',
-  //test_multi_line: 'Line one \n line two \n line three \n'
 //}
 
 //postForms(testFormData, x => console.log(x), (body) => body)

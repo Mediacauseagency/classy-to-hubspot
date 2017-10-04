@@ -2,16 +2,31 @@ const R = require('ramda')
 const moment = require('moment')
 const formatCurrency = require('currency-formatter').format
 
+const usd = amount => formatCurrency(amount, {code: 'USD'})
 const onlyDigits = (st='') => st.replace(/\D/g, '')
-
 const dollarsToCents = st => Number(onlyDigits(st))
-
 const getSupporterId = obj => R.path(['supporter', 'id'], obj)
 
+const constructHistory = (campaigns, history, obj) => {
+  const string = [
+    moment(obj.created_at).format('MM/DD/YY'),
+    usd(obj.total_gross_amount),
+    Boolean(obj.recurring_donation_plan_id) ? 'Recurring' : false,
+    campaigns[obj.campaign_id] ? campaigns[obj.campaign_id]: false,
+    '#' + obj.id
+  ].filter(Boolean).join(' ')
+  return history ? (history + '\n' + string) : string
+}
+
+const calculateTotalDonations = (prev, current) => {
+  const amount = prev
+    ? (dollarsToCents(prev) + dollarsToCents(current))
+    : dollarsToCents(current)
+  return usd(amount * 0.01)
+}
+
 const format = (campaigns, transactions) => {
-
   const transactionsWithSupporters = R.filter(t => t.supporter, transactions)
-
 
   const supportersDict = R.reduce((acc, obj) => {
       const s = obj.supporter
@@ -28,41 +43,31 @@ const format = (campaigns, transactions) => {
       return R.assoc([getSupporterId(obj)], supporter, acc)
   }, {}, transactionsWithSupporters)
 
-  const constructHistory = (history, obj) => {
-    const string = [
-      moment(obj.created_at).format('MM/DD/YY'),
-      formatCurrency(obj.total_gross_amount, {code: 'USD'}),
-      Boolean(obj.recurring_donation_plan_id) ? 'Recurring' : false,
-      campaigns[obj.campaign_id] ? campaigns[obj.campaign_id]: false,
-      '#' + obj.id
-    ].filter(Boolean).join(' ')
-    return history ? (history + '\n' + string) : string
-  }
-
-  const calculateTotalDonations = (prev, current) => {
-    const amount = prev
-      ? (dollarsToCents(prev) + dollarsToCents(current))
-      : dollarsToCents(current)
-    return formatCurrency(amount * 0.01, {code: 'USD'})
-  }
-
-  const x = R.reduce((acc, obj) => {
+  const supportersWithTransactions = R.reduce((acc, obj) => {
     const supporterId = getSupporterId(obj)
     const supporter = acc[supporterId]
-    const history = constructHistory(supporter.history, obj)
-    const totalDonations = calculateTotalDonations(supporter.total_donations_amount, obj.total_gross_amount)
+    const history = constructHistory(campaigns, supporter.history, obj)
+    const totalDonations = calculateTotalDonations(supporter.total_donation_amount, obj.total_gross_amount)
+    const totalDonationsCount = history ? history.split('\n').length : 0
     const updatedSupporter = R.merge(supporter, {
-      history,
-      total_donations_amount: totalDonations
+      donation_history: history,
+      total_donation_amount: totalDonations,
+      total_number_donations: totalDonationsCount
     })
     return R.assoc([supporterId], updatedSupporter, acc)
   }, supportersDict, transactionsWithSupporters)
 
-  debugger
+  const formattedForHubSpot = R.map(s => {
+    return {
+      email: s.email,
+      properties: R.map(k => ({
+        property: k,
+        value: s[k]
+      }), R.keys(s))
+    }
+  }, R.values(supportersWithTransactions))
 
-  return []
-
-
+  return formattedForHubSpot
 }
 
 module.exports = (campaigns, cb) => (transactions) => {
