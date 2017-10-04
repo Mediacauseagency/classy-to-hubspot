@@ -12,7 +12,6 @@ module.exports = [
   'member_phone',
   'is_anonymous',
   'recurring_donation_plan_id',
-  'payment_method',
   'campaign_id',
   'created_at',
   'updated_at',

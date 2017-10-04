@@ -5,12 +5,10 @@ const format = (campaigns, transactions) => {
   return R.map(t => {
     const supporter = t.supporter || {}
     return {
-      transaction_id: t.id,
       first_name: supporter.first_name || t.billing_first_name || '',
       last_name: supporter.last_name || t.billing_last_name || '',
       email_address: supporter.email_address || t.member_email_address || '',
       phone: (supporter.phone || t.member_phone || '').replace(/\D/g, ''),
-      supporter_id: supporter.id || '',
       address_1: supporter.address1 || t.billing_address1 || '',
       address_2: supporter.address2 || t.billing_address2 || '',
       city: supporter.city || t.billing_city || '',
@@ -18,12 +16,10 @@ const format = (campaigns, transactions) => {
       zip: supporter.postal_code || t.billing_postal_code || '',
       country: supporter.country || t.billing_country || '',
       date: t.created_at,
-      campaign_id: t.campaign_id || '',
       campaign_name: campaigns[t.campaign_id] || '',
       amount: t.total_gross_amount,
       recurring: Boolean(t.recurring_donation_plan_id),
       anonymous: Boolean(t.is_anonymous),
-      payment_method: t.payment_method
     }
   }, transactions)
 }

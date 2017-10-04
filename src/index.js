@@ -14,12 +14,15 @@ const dict = require('./helpers/dictionary')
 const {log} = require('./helpers/loggers')
 const updateFile = require('./helpers/updateFile')
 const addDateKeyAndConcat = require('./helpers/addDateKeyAndConcat')
+// const throttleMap = require('./helpers/throttleMap')
+// const rand = require('./helpers/getRandom')
 
 const successHistoryPath = 'history/classy-api-successes.json'
 
 const sendToHubSpot = (formattedData) => {
   const ids = R.pluck('transaction_id', formattedData)
   updateFile(successHistoryPath, ids, addDateKeyAndConcat('ids'))
+  // throttleMap(rand(50, 200), formattedData, (x) => console.log(x))
   // TODO send data to hubspot
 }
 
