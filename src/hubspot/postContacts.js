@@ -5,13 +5,13 @@ const {successMsg} = require('../helpers/loggers')
 
 const url = `https://api.hubapi.com/contacts/v1/contact/batch/?hapikey=${process.env.HUBSPOT_API_KEY}`
 
-module.exports = (body) => {
+module.exports = (data) => {
   request.post({
     url,
-    body,
+    body: data,
     json: true
   }, function (err, resp, body={}) {
     if (body.status === 'error') return writeError(body)
-    successMsg('Hubspot success')
+    successMsg(`Posted ${data.length} contacts.`)
   })
 }

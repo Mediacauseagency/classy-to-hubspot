@@ -1,3 +1,4 @@
+// calls a function on each item in an array every x milliseconds
 const throttleMap = (ms, arr=[], fn) => {
   const len = arr.length
   let i = 0

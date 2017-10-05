@@ -1,35 +1,36 @@
-// first, get various API keys and info from .env and assign them to the process.env
+// First, get various API keys and info from .env and assign them to process.env.
 require('dotenv').config()
 const R = require('ramda')
-const fs = require('fs')
-const moment = require('moment')
 
+// Helpers
+const dict = require('./helpers/dictionary')
+const {log} = require('./helpers/loggers')
+const delayedMap = require('./helpers/delayedMap')
+
+// Classy
 const postToken = require('./classy/postToken')
 const getAllPages = require('./classy/getAllPages')
 const transactionFields = require('./classy/transactionFields')
 const formatData = require('./classy/formatData')
 
+// HubSpot
 const postContacts = require('./hubspot/postContacts')
 
-const dict = require('./helpers/dictionary')
-const {log} = require('./helpers/loggers')
-const updateFile = require('./helpers/updateFile')
-const iso = require('./helpers/iso')
-const addDateKeyAndConcat = require('./helpers/addDateKeyAndConcat')
-const throttleMap = require('./helpers/throttleMap')
-
-const successHistoryPath = 'history/classy-api-successes.json'
-
-const writeIds = (formattedData) => {
+// HubSpot recommends sending no more then 100 contacts at once for bulk
+// updating/creating. So if there are more then 100 items, we break them into
+// chunks of 100 and send each chunk every second until they are all sent.
+const postContactsInChunks = (formattedData) => {
   if (!formattedData) return false
-  updateFile(successHistoryPath, `Downloaded transaction data for ${formattedData.length} supporters.`, addDateKeyAndConcat('message'))
-  if(formattedData.length > 100) {
-    throttleMap(1000, R.splitAt(100, formattedData), postContacts)
+  if (formattedData.length > 100) {
+    delayedMap(1000, R.splitEvery(100, formattedData), postContacts)
   } else {
-   postContacts(formattedData)
+    postContacts(formattedData)
   }
 }
 
+// The only campaign data we get from the transactions response
+// is the campaign id. So to get the campaign name, we get all
+// of the campaigns' ids and names and create a dictionary with them.
 const getAllCampaigns = () => {
   getAllPages({
     resource: 'campaigns',
@@ -42,25 +43,23 @@ const getAllTransactions = (campaignData) => {
   const queryObj = {
     fields: transactionFields.join(','),
     sort: 'created_at:desc',
-    'with': 'supporter',
+    'with': 'supporter'
   }
   getAllPages({
     resource: 'transactions',
-    cb: formatData(dict({data: campaignData, key: 'id', val: 'name'}), writeIds),
+    cb: formatData(
+      dict({data: campaignData, key: 'id', val: 'name'}),
+      postContactsInChunks
+    ),
     queryObj
   })
 }
 
 const init = () => {
-  log('🤖  connecting to Classy API...')
+  log('🤖  Initializing...')
   postToken(getAllCampaigns)
 }
 
-//cron.schedule('0 */30 * * * *', init) 
 init()
 
-//const testFormData = {
-//}
-
-//postForms(testFormData, x => console.log(x), (body) => body)
-
+module.exports = init
