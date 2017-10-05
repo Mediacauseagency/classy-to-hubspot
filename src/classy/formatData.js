@@ -3,30 +3,28 @@ const moment = require('moment')
 const formatCurrency = require('currency-formatter').format
 
 const usd = amount => formatCurrency(amount, {code: 'USD'})
-const onlyDigits = (st='') => st.replace(/\D/g, '')
-const dollarsToCents = st => Number(onlyDigits(st))
+const onlyDigits = (st) => (st + '').replace(/\D/g, '')
 const getSupporterId = obj => R.path(['supporter', 'id'], obj)
 
 const constructHistory = (campaigns, history, obj) => {
   const string = [
+    '-',
     moment(obj.created_at).format('MM/DD/YY'),
     usd(obj.total_gross_amount),
-    Boolean(obj.recurring_donation_plan_id) ? 'Recurring' : false,
-    campaigns[obj.campaign_id] ? campaigns[obj.campaign_id]: false,
-    '#' + obj.id
+    obj.recurring_donation_plan_id ? 'Recurring' : false,
+    campaigns[obj.campaign_id] ? campaigns[obj.campaign_id]: false
   ].filter(Boolean).join(' ')
   return history ? (history + '\n' + string) : string
 }
 
 const calculateTotalDonations = (prev, current) => {
-  const amount = prev
-    ? (dollarsToCents(prev) + dollarsToCents(current))
-    : dollarsToCents(current)
-  return usd(amount * 0.01)
+  return prev ? (Number(prev) + Number(current)) : Number(current)
 }
 
 const format = (campaigns, transactions) => {
-  const transactionsWithSupporters = R.filter(t => t.supporter, transactions)
+  const transactionsWithSupporters = R.filter(R.path(['supporter', 'email_address']), transactions)
+
+    debugger
 
   const supportersDict = R.reduce((acc, obj) => {
       const s = obj.supporter
@@ -46,13 +44,13 @@ const format = (campaigns, transactions) => {
   const supportersWithTransactions = R.reduce((acc, obj) => {
     const supporterId = getSupporterId(obj)
     const supporter = acc[supporterId]
-    const history = constructHistory(campaigns, supporter.history, obj)
-    const totalDonations = calculateTotalDonations(supporter.total_donation_amount, obj.total_gross_amount)
+    const history = constructHistory(campaigns, supporter.donation_history, obj)
+    const totalDonations = calculateTotalDonations(supporter.total_amount_of_classy_donations, obj.total_gross_amount)
     const totalDonationsCount = history ? history.split('\n').length : 0
     const updatedSupporter = R.merge(supporter, {
       donation_history: history,
-      total_donation_amount: totalDonations,
-      total_number_donations: totalDonationsCount
+      total_amount_of_classy_donations: totalDonations,
+      total_number_of_classy_donations: totalDonationsCount
     })
     return R.assoc([supporterId], updatedSupporter, acc)
   }, supportersDict, transactionsWithSupporters)

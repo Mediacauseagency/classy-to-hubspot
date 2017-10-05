@@ -1,4 +1,4 @@
-const throttleMap = (ms=100, arr=[], fn) => {
+const throttleMap = (ms, arr=[], fn) => {
   const len = arr.length
   let i = 0
   const loop = (data) => {
