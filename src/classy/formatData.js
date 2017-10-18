@@ -10,13 +10,15 @@ const getSupporterId = obj => R.path(['supporter', 'id'], obj)
 const constructHistory = (campaigns, history, obj) => {
   const string = [
     '-',
-    moment(obj.created_at).format('MM/DD/YY'),
+    moment(obj.created_at).utc().format('MM/DD/YY'),
     usd(obj.total_gross_amount),
     campaigns[obj.campaign_id] ? campaigns[obj.campaign_id]: false,
     obj.recurring_donation_plan_id ? '(Recurring)' : false
   ].filter(Boolean).join(' ')
   return history ? (history + '\n' + string) : string
 }
+
+const formatLastDonation = date => moment(date).utc().startOf('day').format('x')
 
 const format = (campaigns, transactions) => {
 
@@ -43,20 +45,25 @@ const format = (campaigns, transactions) => {
     const supporterId = getSupporterId(obj)
     const supporter = acc[supporterId]
     const campaign = campaigns[obj.campaign_id]
+    const lastCampaign = (campaign && !supporter.last_campaign) 
+      ? campaign 
+      : supporter.last_campaign
+    const lastDonationDate = (!supporter.last_donation_date)
+      ? formatLastDonation(obj.created_at)
+      : supporter.last_donation_date
     const history = constructHistory(campaigns, supporter.donation_history, obj)
     const totalDonationsCount = history ? history.split('\n').length : 0
     const totalDonations = addStringNumbers(
       supporter.total_amount_of_classy_donations, 
       obj.total_gross_amount
     )
-    const defaultUpdates = {
+    const updates = {
       donation_history: history,
+      last_campaign: lastCampaign,
+      last_donation_date: lastDonationDate,
       total_amount_of_classy_donations: totalDonations,
       total_number_of_classy_donations: totalDonationsCount
     }
-    const updates = (campaign && !supporter.last_campaign)
-      ? R.assoc('last_campaign', campaign, defaultUpdates)
-      : defaultUpdates
     const updatedSupporter = R.merge(supporter, updates)
     return R.assoc([supporterId], updatedSupporter, acc)
   }, supportersDict, transactionsWithSupporters)
