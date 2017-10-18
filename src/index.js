@@ -41,7 +41,7 @@ const getAllCampaigns = () => {
 
 const getAllTransactions = (campaignData) => {
   const queryObj = {
-    fields: transactionFields.join(','),
+   // fields: transactionFields.join(','),
     sort: 'created_at:desc',
     'with': 'supporter'
   }

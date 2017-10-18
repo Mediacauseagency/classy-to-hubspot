@@ -19,6 +19,7 @@ const constructHistory = (campaigns, history, obj) => {
 }
 
 const format = (campaigns, transactions) => {
+
   const transactionsWithSupporters = R.filter(
     R.path(['supporter', 'email_address'])
   , transactions)
@@ -41,17 +42,22 @@ const format = (campaigns, transactions) => {
   const supportersWithTransactions = R.reduce((acc, obj) => {
     const supporterId = getSupporterId(obj)
     const supporter = acc[supporterId]
+    const campaign = campaigns[obj.campaign_id]
     const history = constructHistory(campaigns, supporter.donation_history, obj)
     const totalDonationsCount = history ? history.split('\n').length : 0
     const totalDonations = addStringNumbers(
       supporter.total_amount_of_classy_donations, 
       obj.total_gross_amount
     )
-    const updatedSupporter = R.merge(supporter, {
+    const defaultUpdates = {
       donation_history: history,
       total_amount_of_classy_donations: totalDonations,
       total_number_of_classy_donations: totalDonationsCount
-    })
+    }
+    const updates = (campaign && !supporter.last_campaign)
+      ? R.assoc('last_campaign', campaign, defaultUpdates)
+      : defaultUpdates
+    const updatedSupporter = R.merge(supporter, updates)
     return R.assoc([supporterId], updatedSupporter, acc)
   }, supportersDict, transactionsWithSupporters)
 
