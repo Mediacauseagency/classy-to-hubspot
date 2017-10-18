@@ -2,8 +2,8 @@ const R = require('ramda')
 const moment = require('moment')
 
 const usd = require('../helpers/usd')
-const onlyDigits = require('../helpers/usd')
 const addStringNumbers = require('../helpers/addStringNumbers')
+const normalizePhone = require('../helpers/addStringNumbers')
 
 const getSupporterId = obj => R.path(['supporter', 'id'], obj)
 
@@ -29,7 +29,7 @@ const format = (campaigns, transactions) => {
         firstname: s.first_name,
         lastname: s.last_name,
         email: s.email_address,
-        phone: onlyDigits(s.phone),
+        phone: normalizePhone(s.phone),
         address: (s.address1 || '') + (s.address2 ? ` ${s.address2}` : ''),
         city: s.city,
         zip: s.postal_code,

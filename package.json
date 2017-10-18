@@ -23,6 +23,7 @@
     "dependency-check": "^2.9.1",
     "dotenv": "^4.0.0",
     "moment": "^2.18.1",
+    "phone-formatter": "0.0.2",
     "ramda": "^0.24.1",
     "request": "^2.83.0",
     "standard": "^10.0.3",
