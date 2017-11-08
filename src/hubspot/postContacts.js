@@ -1,7 +1,7 @@
 const R = require('ramda')
 const request = require('request')
 const writeError = require('../helpers/writeError')('history/hubspot-api-errors.json')
-const {successMsg} = require('../helpers/loggers')
+const successMsg = require('../helpers/loggers').successMsg
 
 const url = `https://api.hubapi.com/contacts/v1/contact/batch/?hapikey=${process.env.HUBSPOT_API_KEY}`
 

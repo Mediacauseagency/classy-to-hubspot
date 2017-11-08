@@ -1,7 +1,7 @@
 const R = require('ramda')
 const req = require('./request')
 const baseUrl = require('./baseUrl')
-const {successMsg} = require('../helpers/loggers')
+const successMsg = require('../helpers/loggers').successMsg
 
 // helpers
 const pageMsg = (page, resource) => `Retrieved page ${page} of ${resource}.`

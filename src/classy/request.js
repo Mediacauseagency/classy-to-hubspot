@@ -2,7 +2,7 @@ const R = require('ramda')
 const request = require('request')
 const baseUrl = require('./baseUrl')
 const writeError = require('../helpers/writeError')('history/classy-api-errors.json')
-const {successMsg} = require('../helpers/loggers')
+const successMsg = require('../helpers/loggers').successMsg
 
 module.exports = (options, callback, msg) => {
   request(R.merge({

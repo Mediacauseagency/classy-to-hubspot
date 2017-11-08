@@ -4,7 +4,7 @@ const R = require('ramda')
 
 // Helpers
 const dict = require('./helpers/dictionary')
-const {log} = require('./helpers/loggers')
+const log = require('./helpers/loggers').log
 const delayedMap = require('./helpers/delayedMap')
 
 // Classy

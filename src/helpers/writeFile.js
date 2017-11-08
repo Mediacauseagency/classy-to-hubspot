@@ -1,5 +1,5 @@
 const fs = require('fs')
-const {errMsg} = require('./loggers')
+const errMsg = require('./loggers').errMsg
 
 const write = (path, content, cb) => {
   fs.writeFile(path, content, function (err) {
