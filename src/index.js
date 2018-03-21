@@ -16,7 +16,7 @@ const formatData = require('./classy/formatData')
 // HubSpot
 const postContacts = require('./hubspot/postContacts')
 
-// HubSpot recommends sending no more then 100 contacts at once for bulk
+// HubSpot recommends sending no more than 100 contacts at once for bulk
 // updating/creating. So if there are more then 100 items, we break them into
 // chunks of 100 and send each chunk every second until they are all sent.
 const postContactsInChunks = (formattedData) => {

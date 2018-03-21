@@ -68,15 +68,29 @@ const format = (campaigns, transactions) => {
     return R.assoc([supporterId], updatedSupporter, acc)
   }, supportersDict, transactionsWithSupporters)
 
-  return  R.map(s => {
+  const data = R.map(supporter => {
     return {
-      email: s.email,
-      properties: R.map(k => ({
-        property: k,
-        value: s[k]
-      }), R.keys(s))
+      email: supporter.email,
+      properties: setProperties(supporter)
     }
   }, R.values(supportersWithTransactions))
+  return data
+}
+
+function setProperties(supporter) {
+  const keys = R.keys(supporter)
+  const properties = R.map(key => {
+    const value = supporter[key]
+    if(value) {
+      return {
+        property: key,
+        value: value
+      }
+    } else {
+      return false
+    }
+  }, keys).filter(Boolean)
+  return properties
 }
 
 module.exports = (campaigns, cb) => (transactions) => {
